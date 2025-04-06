@@ -12,3 +12,4 @@
 /home/kachlon/C#Projects/versionControl/obj/Debug/net9.0/Updater.pdb
 /home/kachlon/C#Projects/versionControl/obj/Debug/net9.0/Updater.genruntimeconfig.cache
 /home/kachlon/C#Projects/versionControl/obj/Debug/net9.0/ref/Updater.dll
+/home/kachlon/C#Projects/versionControl/obj/Debug/net9.0/Updater.sourcelink.json

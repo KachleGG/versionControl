@@ -3,9 +3,10 @@
     class Program {
         
         static void Main(string[] args) {
-            string version = "1.0.2";
-            Updater updater = new Updater("https://github.com/KachleGG/versionControl/version.txt", ".zip");
-            updater.CheckAndUpdate(version);
+            Version currentVersion = Version.Parse(File.ReadAllText("version.txt"));
+            Version latestVersion = Version.Parse(File.ReadAllText("https://github.com/KachleGG/versionControl/version.txt"));
+            Console.WriteLine(currentVersion);
+            Console.WriteLine(latestVersion);
         }
     }
 }
