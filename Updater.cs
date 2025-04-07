@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Updater {
     class Updater {
@@ -101,6 +102,19 @@ namespace Updater {
                 }
         }
 
+        public string GetPlatform() {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Environment.Is64BitOperatingSystem) {
+                return "win-x64";
+            } else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && Environment.Is64BitOperatingSystem) {
+                return "linux-x64";
+            } else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && Environment.Is64BitOperatingSystem) {
+                return "osx-x64";
+            } else { 
+                Console.WriteLine("Your platform is not supported. Automatic updating isn't permited.");
+                return ""; 
+            }
+        }
+
         public void Update() {
             RemoveOldVersions();
             if (IsUpdateAvailable()) {
@@ -110,9 +124,11 @@ namespace Updater {
                 if (input == "y") {
                     Console.WriteLine("Updating...");
                     
-                    try {
+                    try { // Add .exe file support
+                        string platform = GetPlatform();
                         // Download the update file directly to the same directory
-                        string updateFileName = $"{_appName}-{latestVersion}.exe";
+                        string updateFileName = $"{_appName}_{platform}-{latestVersion}";
+                        if (platform == "win-x64") { updateFileName += ".exe"; }
                         string updateUrl = _rawBaseUrl + updateFileName;
                         string newFilePath = Path.Combine(_executableDirectory, updateFileName);
                         
