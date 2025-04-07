@@ -82,25 +82,23 @@ namespace Updater {
         }
 
         public void RemoveOldVersions() {
-            /* For debuging */
-            using (StreamWriter writer = new StreamWriter("updateInfo.txt")) { writer.WriteLine(_executablePath); }
-
-
-
-
+            
             // Reads the contents of the "updateInfo.txt" file
-            string updateInfoOldDelete = File.ReadAllText("updateInfo.txt").Trim();
+            if (File.Exists("updateInfo.txt")) { 
+                    string updateInfoOldDelete = File.ReadAllText("updateInfo.txt").Trim(); 
+                    
+                    // Delete the "updateInfo.txt" file
+                    if (File.Exists("updateInfo.txt")) { File.Delete("updateInfo.txt"); }
 
-
-            // Make sure the file exists before attempting deletion
-            if (File.Exists(updateInfoOldDelete)) {
-                // Wait a moment to ensure the file isn't locked
-                System.Threading.Thread.Sleep(1000);
-                File.Delete(updateInfoOldDelete);
-                Console.WriteLine($"Successfully deleted {updateInfoOldDelete}");
-                System.Threading.Thread.Sleep(1000);
-            }
-              
+                    // Make sure the file exists before attempting deletion
+                    if (File.Exists(updateInfoOldDelete)) {
+                        // Wait a moment to ensure the file isn't locked
+                        System.Threading.Thread.Sleep(1000);
+                        File.Delete(updateInfoOldDelete);
+                        Console.WriteLine($"Successfully deleted {updateInfoOldDelete}");
+                        System.Threading.Thread.Sleep(1000);
+                    }
+                }
 
             // Delete the "updateInfo.txt" file
             if (File.Exists("updateInfo.txt")) { File.Delete("updateInfo.txt"); }
