@@ -1,2 +1,0 @@
-/home/kachlon/C#Projects/versionControl/bin/Release/net9.0/linux-x64/publish/Updater.pdb
-/home/kachlon/C#Projects/versionControl/bin/Release/net9.0/linux-x64/publish/Updater
