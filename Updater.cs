@@ -74,7 +74,7 @@ namespace Updater {
                     
                     try {
                         // Download the update file directly to the same directory
-                        string updateFileName = $"{_appName}-{latestVersion}.exe";
+                        string updateFileName = $"{_appName}-{latestVersion}";
                         string updateUrl = _rawBaseUrl + updateFileName;
                         string newFilePath = Path.Combine(_executableDirectory, updateFileName);
                         
