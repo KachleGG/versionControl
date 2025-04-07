@@ -86,7 +86,7 @@ namespace Updater {
             // Reads the contents of the "updateInfo.txt" file
             if (File.Exists("updateInfo.txt")) { 
                     string updateInfoOldDelete = File.ReadAllText("updateInfo.txt").Trim(); 
-                    
+
                     // Delete the "updateInfo.txt" file
                     if (File.Exists("updateInfo.txt")) { File.Delete("updateInfo.txt"); }
 
@@ -99,12 +99,10 @@ namespace Updater {
                         System.Threading.Thread.Sleep(1000);
                     }
                 }
-
-            // Delete the "updateInfo.txt" file
-            if (File.Exists("updateInfo.txt")) { File.Delete("updateInfo.txt"); }
         }
 
         public void Update() {
+            RemoveOldVersions();
             if (IsUpdateAvailable()) {
                 Console.WriteLine($"Update available: {currentVersion} → {latestVersion}");
                 Console.WriteLine("Do you want to update? (y/n)");
