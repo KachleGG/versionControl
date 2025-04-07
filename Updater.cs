@@ -8,7 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace Updater {
+namespace UpdateMGR {
     class Updater {
         private readonly string _username;
         private readonly string _repository;
