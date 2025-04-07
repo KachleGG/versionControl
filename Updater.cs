@@ -64,6 +64,34 @@ namespace Updater {
             return latestVersion > currentVersion;
         }
 
+        public void RunUpdatedApp() {
+            string updatedApp = $"{_appName}-{latestVersion}.exe";
+
+            ProcessStartInfo updatedAppRun = new ProcessStartInfo {
+            FileName = updatedApp,
+            CreateNoWindow = false,
+            UseShellExecute = true
+            };
+
+            try {
+            Process.Start(updatedAppRun);
+            } catch (Exception ex) {
+                Console.WriteLine($"Error running updated app: {ex.Message}");
+                Console.WriteLine("Run the updated app manually");
+            }
+        }
+
+        public void RemoveOldVersions() {
+            // Reads the contents of the "updateInfo.txt" file
+            string updateInfoOldDelete = File.ReadAllText("updateInfo.txt").Trim();
+
+            // Removes the old executable
+            File.Delete(updateInfoOldDelete);
+
+            // Delete the "updateInfo.txt" file
+            File.Delete("updateInfo.txt");
+        }
+
         public void Update() {
             if (IsUpdateAvailable()) {
                 Console.WriteLine($"Update available: {currentVersion} → {latestVersion}");
@@ -82,8 +110,14 @@ namespace Updater {
                         byte[] fileData = _httpClient.GetByteArrayAsync(updateUrl).GetAwaiter().GetResult();
                         File.WriteAllBytes(newFilePath, fileData);
                         
-                        Console.WriteLine($"Update downloaded successfully to: {newFilePath}");
-                        Console.WriteLine("Please run the new version manually.");
+                        // Write old app Path into a .txt file
+                        using (StreamWriter writer = new StreamWriter("updateInfo.txt")) { writer.WriteLine(_executablePath); }
+
+                        // Runs the updated app
+                        RunUpdatedApp();
+
+                        // Exits outdated(this) app to prepare it for deletion
+                        Environment.ExitCode = 0;
                     }
                     catch (Exception ex) {
                         Console.WriteLine($"Error during update: {ex.Message}");
