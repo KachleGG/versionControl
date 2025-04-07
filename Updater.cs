@@ -85,8 +85,20 @@ namespace Updater {
             // Reads the contents of the "updateInfo.txt" file
             string updateInfoOldDelete = File.ReadAllText("updateInfo.txt").Trim();
 
-            // Removes the old executable
-            File.Delete(updateInfoOldDelete);
+            try {
+                // Make sure the file exists before attempting deletion
+                if (File.Exists(updateInfoOldDelete)) {
+                    // Wait a moment to ensure the file isn't locked
+                    System.Threading.Thread.Sleep(1000);
+                    File.Delete(updateInfoOldDelete);
+                    Console.WriteLine($"Successfully deleted {updateInfoOldDelete}");
+                    System.Threading.Thread.Sleep(1000);
+                }
+            }
+            catch (Exception ex) {
+                Console.WriteLine($"Could not delete old version: {ex.Message}");
+                // You might want to flag this for later deletion on next startup
+            }   
 
             // Delete the "updateInfo.txt" file
             File.Delete("updateInfo.txt");
