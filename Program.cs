@@ -3,11 +3,9 @@
     class Program {
         
         static void Main(string[] args) {
-            // Initialize updater
-            Updater updater = new Updater("KachleGG", "versionControl");
-
-            Console.WriteLine(updater.currentVersion);
-            Console.WriteLine(updater.latestVersion);
+            // Initialize updater and try to update
+            Updater updater = new Updater("KachleGG", "versionControl", "1.0.3", "Updatr");
+            updater.Update();
         }
     }
 }
