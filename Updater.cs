@@ -66,7 +66,8 @@ namespace Updater {
         }
 
         public void RunUpdatedApp() {
-            string updatedApp = $"{_appName}-{latestVersion}.exe";
+            string platform = GetPlatform();
+            string updatedApp = $"{_appName}_{platform}-{latestVersion}.exe";
 
             ProcessStartInfo updatedAppRun = new ProcessStartInfo {
             FileName = updatedApp,
