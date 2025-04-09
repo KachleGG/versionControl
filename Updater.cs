@@ -38,8 +38,7 @@ namespace UpdateMGR {
             
             try {
                 // Get latest version
-                string versionString = GetLatestVersion();
-                latestVersion = Version.Parse(versionString);
+                latestVersion = Version.Parse(GetLatestVersion());
             }
             catch (FormatException) {
                 // Handle error in version format
@@ -65,25 +64,79 @@ namespace UpdateMGR {
             return latestVersion > currentVersion;
         }
 
-        public void RunUpdatedApp() {
-            string platform = GetPlatform();
+        public void RunUpdatedApp(string platform) {
             string updatedApp = $"{_appName}_{platform}-{latestVersion}.exe";
+            string currentProcessName = Path.GetFileNameWithoutExtension(_executablePath);
 
-            ProcessStartInfo updatedAppRun = new ProcessStartInfo {
-            FileName = updatedApp,
-            CreateNoWindow = false,
-            UseShellExecute = true
-            };
+            // Create a batch script to handle the update process
+            string batchScript = Path.Combine(_executableDirectory, "update.bat");
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                batchScript = Path.Combine(_executableDirectory, "update.sh");
+            }
 
-            try {
-            Process.Start(updatedAppRun);
-            } catch (Exception ex) {
+            try
+            {
+                // Create the update script
+                using (StreamWriter writer = new StreamWriter(batchScript))
+                {
+                    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                    {
+                        writer.WriteLine("@echo off");
+                        writer.WriteLine("timeout /t 2 /nobreak > nul");
+                        writer.WriteLine($"taskkill /F /IM \"{currentProcessName}.exe\" > nul 2>&1");
+                        writer.WriteLine($"start \"\" \"{updatedApp}\"");
+                        writer.WriteLine("del \"%~f0\"");
+                    }
+                    else
+                    {
+                        writer.WriteLine("#!/bin/bash");
+                        writer.WriteLine("sleep 2");
+                        writer.WriteLine($"pkill -f \"{currentProcessName}\"");
+                        writer.WriteLine($"chmod +x \"{updatedApp}\"");
+                        writer.WriteLine($"\"{updatedApp}\" &");
+                        writer.WriteLine("rm \"$0\"");
+                    }
+                }
+
+                // Make the script executable on Linux/MacOS
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("chmod", $"+x \"{batchScript}\"");
+                }
+
+                // Run the update script
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = batchScript,
+                    UseShellExecute = true,
+                    CreateNoWindow = true
+                };
+
+                Process.Start(startInfo);
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine($"Error running updated app: {ex.Message}");
                 Console.WriteLine("Run the updated app manually");
             }
         }
 
         public void RemoveOldVersions() {
+            // Clean up any leftover update scripts
+            string updateScript = Path.Combine(_executableDirectory, 
+                RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "update.bat" : "update.sh");
+            if (File.Exists(updateScript))
+            {
+                try
+                {
+                    File.Delete(updateScript);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Warning: Could not delete update script: {ex.Message}");
+                }
+            }
             
             // Reads the contents of the "updateInfo.txt" file
             if (File.Exists("updateInfo.txt")) { 
@@ -125,10 +178,11 @@ namespace UpdateMGR {
                 if (input == "y") {
                     Console.WriteLine("Updating...");
                     
-                    try { // Add .exe file support
+                    try {
                         string platform = GetPlatform();
                         // Download the update file directly to the same directory
                         string updateFileName = $"{_appName}_{platform}-{latestVersion}";
+                        // Add .exe if it is a windows executable
                         if (platform == "win-x64") { updateFileName += ".exe"; }
                         string updateUrl = _rawBaseUrl + updateFileName;
                         string newFilePath = Path.Combine(_executableDirectory, updateFileName);
@@ -141,10 +195,10 @@ namespace UpdateMGR {
                         using (StreamWriter writer = new StreamWriter("updateInfo.txt")) { writer.WriteLine(_executablePath); }
 
                         // Runs the updated app
-                        RunUpdatedApp();
+                        RunUpdatedApp(platform);
 
                         // Exits outdated(this) app to prepare it for deletion
-                        Environment.ExitCode = 0;
+                        Environment.Exit(0);
                     }
                     catch (Exception ex) {
                         Console.WriteLine($"Error during update: {ex.Message}");
