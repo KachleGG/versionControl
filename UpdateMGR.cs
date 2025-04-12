@@ -142,6 +142,40 @@ class Updater {
         return platform;
     }
 
+    public void LinuxExecCheck() {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+            return; // Exit if not on Linux
+        }
+
+        // Construct the full path to the executable
+        string filePath = Path.Combine(_executableDirectory, _latestAppName);
+
+        // Check if the file exists
+        if (!File.Exists(filePath)) {
+            Console.WriteLine($"File {filePath} does not exist.");
+            return;
+        }
+
+        // Set the file to executable using ProcessStartInfo
+        var processInfo = new ProcessStartInfo {
+            FileName = "chmod",
+            Arguments = $"+x \"{filePath}\"", // Use quotes to handle spaces in file paths
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using (var process = Process.Start(processInfo)) {
+            process.WaitForExit();
+            if (process.ExitCode == 0) {
+                Console.WriteLine($"File {filePath} has been made executable.");
+            } else {
+                Console.WriteLine($"Failed to make {filePath} executable. Error: {process.StandardError.ReadToEnd()}");
+            }
+        }
+    }
+
     public void Update() {
         RemoveOldVersions();
 
@@ -174,6 +208,9 @@ class Updater {
             using (StreamWriter writer = new StreamWriter("updateInfo.txt")) { 
                 writer.WriteLine(Process.GetCurrentProcess().MainModule.FileName);
             }
+
+            // Checks linux file executability
+            LinuxExecCheck();
 
             // Runs the updated app
             RunUpdatedApp();
