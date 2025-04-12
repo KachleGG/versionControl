@@ -24,6 +24,7 @@ class Updater {
     private readonly HttpClient _httpClient;
 
     // Executable info
+    private readonly string _executablePath;
     private readonly string _executableDirectory;
     private readonly string _appName;
     private readonly string _platform;
@@ -36,10 +37,10 @@ class Updater {
         _appName = appName;
 
         _platform = GetPlatform();
-        _latestAppName = $"{_appName}_{_platform}-{latestVersion}{(_platform == "win-x64" ? ".exe" : "")}";
         currentVersion = Version.Parse(version);
         
         // Get the path of the current executable
+        _executablePath = Process.GetCurrentProcess().MainModule.FileName;
         _executableDirectory = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
         
         // Construct the raw GitHub URL format
@@ -50,6 +51,9 @@ class Updater {
             // Get latest version
             string versionString = GetLatestVersion();
             latestVersion = Version.Parse(versionString);
+            
+            // Now set the _latestAppName after latestVersion is assigned
+            _latestAppName = $"{_appName}_{_platform}-{latestVersion}{(_platform == "win-x64" ? ".exe" : "")}";
         }
         catch (FormatException) {
             // Handle error in version format
