@@ -12,5 +12,5 @@
  - App name
  - branch(default is "main")
 
- ## Compilation for debugging: ```dotnet publish -c Release -r linux-x64 --self-contained true /p:PublishTrimmed=true /p:TrimMode=link /p:PublishSingleFile=true /p:InvariantGlobalization=true /p:DebugType=None /p:DebugSymbols=false /p:AssemblyName="Updatr_linux-x64-1.1.4"
+ ## Compilation for debugging: ```dotnet publish -c Release -r linux-x64 --self-contained true /p:PublishTrimmed=true /p:TrimMode=link /p:PublishSingleFile=true /p:InvariantGlobalization=true /p:DebugType=None /p:DebugSymbols=false /p:AssemblyName="Updatr_linux-x64-1.1.3"
 ```
