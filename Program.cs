@@ -5,7 +5,7 @@ namespace UpdateMGR {
         
         static void Main(string[] args) {
             // Initialize updater and try to update
-            Updater updater = new Updater("KachleGG", "versionControl", "1.1.7", "Updatr");
+            Updater updater = new Updater("KachleGG", "versionControl", "1.1.8", "Updatr");
             updater.Update();
         }
     }
